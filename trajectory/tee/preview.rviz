@@ -1,0 +1,41 @@
+Panels:
+  - Class: rviz_common/Displays
+    Name: Displays
+Visualization Manager:
+  Class: ""
+  Global Options:
+    Fixed Frame: world
+    Background Color: 28; 34; 43
+  Displays:
+    - Class: rviz_default_plugins/Grid
+      Name: Grid 100 mm
+      Enabled: true
+      Cell Size: 0.1
+      Plane Cell Count: 20
+    - Class: rviz_default_plugins/RobotModel
+      Name: ROKAE SR5 and torch
+      Enabled: true
+      Description Source: Topic
+      Description Topic:
+        Value: /robot_description
+        Durability Policy: Transient Local
+      Visual Enabled: true
+      Collision Enabled: false
+    - Class: rviz_default_plugins/MarkerArray
+      Name: Dataset coupon and seam
+      Enabled: true
+      Topic:
+        Value: /welding_scene
+  Views:
+    Current:
+      Class: rviz_default_plugins/Orbit
+      Distance: 1.5
+      Focal Point:
+        X: 0.3
+        Y: 0
+        Z: 0.35
+      Pitch: 0.4
+      Yaw: 3.9
+Window Geometry:
+  Width: 1280
+  Height: 850

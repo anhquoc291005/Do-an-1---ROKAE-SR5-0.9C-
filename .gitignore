@@ -1,0 +1,8 @@
+external/
+.venv*/
+**/__pycache__/
+*.py[cod]
+**/build/
+**/generated/
+**/results/
+*.log

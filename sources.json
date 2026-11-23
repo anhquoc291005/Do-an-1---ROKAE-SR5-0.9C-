@@ -1,0 +1,10 @@
+{
+  "rokae_ros2": {
+    "url": "https://github.com/RokaeRobot/rokae_ros2",
+    "commit": "d6a508c38513d4c39b2f10f14275d0e26df7fb43"
+  },
+  "weldment-dataset": {
+    "url": "https://github.com/RoboticsNetworkTrieste/weldment-dataset",
+    "commit": "aec6dfb4052c1580e1477f175853fc7606ec6257"
+  }
+}
