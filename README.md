@@ -7,7 +7,7 @@ Mã nguồn đồ án cho tay máy nối tiếp sáu khớp quay. Hai ví dụ h
 | Thư mục | Các tệp chính và chức năng |
 |---|---|
 | `forward_kinematics/` | `fk.py` tính tư thế mặt bích, TCP và Jacobian hình học từ URDF. `draw_standard_dh.py` tính theo DH tiêu chuẩn và so sánh với URDF. |
-| `inverse_kinematics/` | `tee.cpp` và `v_path.cpp` gọi MoveIt 2/KDL, kiểm tra giới hạn khớp và va chạm, xuất nghiệm IK theo thời gian. CMake của từng ví dụ biên dịch tệp tương ứng. |
+| `ik ( demo)/` | `tee.cpp` và `v_path.cpp` gọi MoveIt 2/KDL, kiểm tra giới hạn khớp và va chạm, xuất nghiệm IK theo thời gian. CMake của từng ví dụ biên dịch tệp tương ứng. |
 | `trajectory/tee/` | Tạo phôi chữ T và quỹ đạo hàn thẳng. |
 | `trajectory/v_path/` | Tạo phôi tấm và quỹ đạo hai đoạn chữ V. Trong mỗi ví dụ, `prepare_robot.py` tạo mô hình có mỏ, `prepare_workpiece.py` tạo phôi và các tư thế đích, `analyze.py` kiểm tra kết quả. |
 | `simulation/mujoco/` | Dựng mô hình vật lý, điều khiển sáu khớp theo quỹ đạo chữ V, đo sai số bám và hiển thị robot. |
