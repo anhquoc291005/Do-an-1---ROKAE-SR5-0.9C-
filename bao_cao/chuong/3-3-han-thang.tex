@@ -30,7 +30,7 @@ Tại thời điểm \(t_k\), đích \(T_{d,k}\) được giữ cố định tro
   \item \textbf{Dừng và chọn nghiệm.} Ở chế độ giải đủ vị trí và hướng, KDL kiểm tra riêng chuẩn của phần tịnh tiến (m) và phần quay (rad) với cùng ngưỡng số mặc định \(10^{-5}\). Một lần thử có tối đa 500 vòng lặp. Khi cần, bộ giải có thể thử cấu hình khởi tạo khác trong thời gian tìm kiếm. Hàm kiểm tra của ứng dụng chỉ chấp nhận cấu hình thỏa giới hạn khớp và qua kiểm tra va chạm với mô hình robot, bàn và phôi. Nếu \(\|\mathbf q_k^\star-\mathbf q_{k-1}^\star\|_\infty>0{,}05\,\mathrm{rad}\), chương trình dừng để tránh chuyển nhánh đột ngột.
 \end{enumerate}
 
-\noindent\textbf{Ví dụ tính bước từ mẫu 440 sang mẫu 441.}
+\noindent\textbf{Ví dụ hàn thẳng: tính bước từ mẫu 440 sang mẫu 441.}
 Tại hai mẫu giữa đường, thời điểm tương ứng là \(21{,}98751\) và \(22{,}03749\,\mathrm{s}\). Tọa độ \(y\) đặt của TCP tăng từ \(-0{,}124929\) lên \(+0{,}124929\,\mathrm{mm}\). Thay nghiệm mẫu 440 vào FK, so với đích mẫu 441, sai số vị trí ban đầu xấp xỉ \((0{,}000060,0{,}249918,-0{,}000009)\,\mathrm{mm}\). Với trọng số đơn vị tại bước này, lấy Jacobi đã lưu ở mẫu 440 và tính \(J^+\mathbf e\) thu được
 \[
   \Delta\mathbf q\simeq10^{-3}
@@ -39,8 +39,60 @@ Tại hai mẫu giữa đường, thời điểm tương ứng là \(21{,}98751\
 \]
 Bước tính lại từ dữ liệu FK và Jacobi khớp với hiệu \(\mathbf q_{441}^{\star}-\mathbf q_{440}^{\star}\) trong quỹ đạo đã ghi. Sau hiệu chỉnh, sai số vị trí của mẫu 441 còn khoảng \(0{,}000086\,\mathrm{mm}\).
 
+\subsubsection*{Ví dụ giải động học nghịch cho đường hàn chữ V}
+Đường hàn được lấy mẫu thành dãy \((t_k,\mathbf p_{d,k},R_{d,k})\), với \(t_k\) là thời điểm yêu cầu của mẫu \(k\). Trong mô phỏng, mỏ hướng xuống và TCP đặt cách vị trí hàn \(5\,\mathrm{mm}\) theo phương đứng. Tại mẫu đầu tiên, chương trình thử một số bộ góc khởi tạo để tìm nghiệm phù hợp. Từ mẫu tiếp theo, nghiệm của mẫu trước được dùng làm giá trị khởi tạo cho lần thử đầu tiên:
+\[
+  \mathbf q_k^{(0)}=\mathbf q_{k-1}^{\star},\qquad k\geq 1.
+\]
+Chương trình gọi \textit{setFromIK} để giải pose của \textit{welding\_tcp} và kiểm tra nghiệm theo giới hạn khớp và va chạm. Để phát hiện chuyển nhánh nghiệm, chương trình kiểm tra độ thay đổi lớn nhất của một góc khớp giữa hai mẫu. Trong bài thử này, quỹ đạo bị loại nếu \(\|\mathbf q_k^\star-\mathbf q_{k-1}^\star\|_\infty > 0{,}05\,\mathrm{rad}\).
+
+\noindent\textbf{Kết quả tính toán.}
+Chẳng hạn, tại \(t_{501}\approx25{,}047\,\mathrm{s}\), vị trí TCP yêu cầu trong hệ đế là
+\[
+  \mathbf p_{d,501}\approx
+    [0{,}466610,\,-0{,}002530,\,0{,}305000]^{\mathsf T}\,\mathrm{m}.
+\]
+Hướng đích của mỏ tại mẫu này là \(R_{d,501}=\operatorname{diag}(1,-1,-1)\). Dùng nghiệm tại mẫu \(500\) làm giá trị khởi tạo, chương trình giải được bộ góc khớp
+\[
+  \mathbf q_{501}^{\star}\approx
+    [2{,}84042,\,-0{,}29191,\,1{,}50121,\,-3{,}14159,\,-1{,}34847,\,2{,}84042]^{\mathsf T}
+    \,\mathrm{rad}.
+\]
+Trên toàn bộ \(1\,969\) mẫu, sai số vị trí TCP lớn nhất khi tính lại bằng động học thuận là \(0{,}00995\,\mathrm{mm}\). Độ thay đổi góc lớn nhất của một khớp giữa hai mẫu liên tiếp là \(0{,}0265^\circ\). Chương trình kiểm tra giới hạn khớp và va chạm tại \(11\,808\) lượt lấy mẫu trên các đoạn nội suy, tất cả đều đạt trong mô hình mô phỏng. Cuối cùng, các nghiệm \((t_k,\mathbf q_k^\star)\) được xuất thành quỹ đạo khớp theo thời gian để mô phỏng.
+
+\noindent\textbf{Tính tại mẫu 501 trên đường hàn chữ V.}
+Thay nghiệm \(\mathbf q_{501}^{\star}\) vừa tính vào bảng D--H sau khi quy đổi, ta thu được \(\mathbf p_E\approx[0{,}466610,\,-0{,}002530,\,0{,}305000]^{\mathsf T}\,\mathrm{m}\). Lấy các trục và gốc từ \({}^0T_0,\ldots,{}^0T_5\), sau đó tính lần lượt sáu tích có hướng, thu được
+\[
+  J_E^{\mathrm{DH}}\approx
+  \begin{bmatrix}
+     0{,}002530 &-0{,}021965 &-0{,}401542 & 0{,}110666 & 0{,}270739 & 0\\
+     0{,}466610 & 0{,}006823 & 0{,}124728 & 0{,}255180 &-0{,}084098 & 0\\
+     0          &-0{,}446358 &-0{,}379130 & 0{,}132653 & 0          & 0\\
+     0          & 0{,}296642 & 0{,}296642 & 0{,}931485 &-0{,}296642 & 0\\
+     0          & 0{,}954989 & 0{,}954989 &-0{,}289341 &-0{,}954989 & 0\\
+     1          & 0          & 0          &-0{,}220496 & 0          & 1
+  \end{bmatrix}.
+\]
+Ba phần tử trên cùng của cột thứ sáu bằng \(0\) vì TCP nằm trên trục khớp 6 trong mô hình mỏ của demo. Các phần tử của ma trận được làm tròn khi trình bày. Phép đối chiếu dùng giá trị đầy đủ.
+
+Vận tốc khớp tại mẫu \(501\) được xấp xỉ bằng sai phân trung tâm theo hai mẫu kề:
+\[
+  \dot{\mathbf q}^{\mathrm{DH}}_{501}
+  \approx \frac{S(\mathbf q^{\mathrm{ROS}}_{502}-\mathbf q^{\mathrm{ROS}}_{500})}
+                {t_{502}-t_{500}}
+  \approx 10^{-3}[-7{,}232,\,6{,}702,\,-7{,}891,\,0,\,-1{,}188,\,7{,}232]^{\mathsf T}
+  \,\mathrm{rad/s}.
+\]
+Nhân ma trận Jacobi với vận tốc khớp theo phương trình~\eqref{eq:sr5-velocity-jacobian} cho vận tốc tịnh tiến
+\[
+  \mathbf v_E\approx[2{,}681,\,-4{,}213,\,0]^{\mathsf T}\,\mathrm{mm/s},
+  \qquad
+  \|\mathbf v_E\|\approx4{,}994\,\mathrm{mm/s}.
+\]
+Vận tốc góc xấp xỉ bằng \(0\) tại mẫu này, phù hợp với yêu cầu giữ hướng mỏ cố định. Sai phân trung tâm từ các vị trí TCP trong tệp \textit{fk.csv} cũng cho tốc độ \(4{,}994\,\mathrm{mm/s}\) sau khi làm tròn. Trên toàn bộ \(1\,969\) mẫu, ma trận quy đổi theo phương trình~\eqref{eq:sr5-jacobian-ros} và ma trận MoveIt~2 lưu trong tệp \textit{jacobian.csv} sai khác lớn nhất khoảng \(1{,}2\times10^{-15}\) theo từng phần tử khi tính bằng mét và radian.
+
 \subsection{Đầu ra và kiểm chứng}
-Đầu ra chính là 882 dòng \((t_k,q_{1,k},\ldots,q_{6,k})\) trong \texttt{trajectory.csv}, với góc khớp theo quy ước URDF, tính bằng radian. Ba cấu hình sau cho thấy sự thay đổi của cả sáu khớp khi TCP di chuyển theo một đường thẳng.
+Đối với bài hàn thẳng, đầu ra chính là 882 dòng \((t_k,q_{1,k},\ldots,q_{6,k})\) trong \texttt{trajectory.csv}, với góc khớp theo quy ước URDF, tính bằng radian. Ba cấu hình sau cho thấy sự thay đổi của cả sáu khớp khi TCP di chuyển theo một đường thẳng.
 \begin{center}
 \small
 \begin{tabular}{@{}rrrrrrrr@{}}

@@ -11,6 +11,7 @@
 \usepackage[unicode,hidelinks]{hyperref}
 \hypersetup{pdftitle={Đồ án 1 — Robot ROKAE SR5-5/0.9C}}
 \renewcommand{\contentsname}{Mục lục}
+\renewcommand{\bibname}{Tài liệu tham khảo}
 \renewcommand{\chaptername}{Chương}
 \renewcommand{\figurename}{Hình}
 \renewcommand{\tablename}{Bảng}
@@ -32,4 +33,12 @@
 \input{chuong/tong-quan}
 \input{chuong/dong-hoc}
 \input{chuong/mo-phong}
+\begin{thebibliography}{1}
+  \phantomsection
+  \addcontentsline{toc}{chapter}{\bibname}
+  \bibitem{me3209}
+  Phan Bùi Khôi và Nguyễn Quang Hoàng,
+  \textit{Robotics -- Tài liệu đọc (ME3209)}.
+  Trường Cơ khí, Đại học Bách khoa Hà Nội, 12/2023.
+\end{thebibliography}
 \end{document}

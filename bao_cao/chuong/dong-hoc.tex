@@ -129,6 +129,78 @@ Các góc trong bảng tính bằng radian. Từ bảng thông số D--H, ma tr�
 \]
 
 \subsection{Động học nghịch robot}
+\subsubsection*{Cơ sở lý thuyết của bài toán động học nghịch}
+\noindent\textbf{Phát biểu tổng quát.}
+Theo tài liệu ME3209~\cite[mục 3.2.1, tr.~66--68]{me3209}, cho tư thế đích của khâu cuối
+\[
+ H=\begin{bmatrix}R_d&\mathbf p_d\\\mathbf 0^{\mathsf T}&1\end{bmatrix}.
+\]
+Cần tìm \(\mathbf q=[q_1,\ldots,q_n]^{\mathsf T}\) sao cho \(T(\mathbf q)=H\).
+So sánh ba hàng đầu của hai ma trận cho 12 phương trình đại số phi tuyến. Ba phần tử của vectơ vị trí và ba tham số độc lập của ma trận quay tạo thành sáu điều kiện tư thế. Bài toán có thể không có nghiệm, có một nghiệm, có nhiều nghiệm rời rạc hoặc có vô số nghiệm, tùy tư thế đích và cấu trúc tay máy. Mỗi nghiệm phải thỏa giới hạn cơ khí \(q_{i,\min}\le q_i\le q_{i,\max}\).
+
+\medskip
+\noindent\textbf{Giải bằng phương pháp hình học.}
+Dựa vào cấu trúc khâu và trục khớp, chọn các điểm trung gian để rút hệ phương trình tư thế về các quan hệ hình học đơn giản. Nghiệm giải tích cho phép tính trực tiếp biến khớp và liệt kê các nhánh trước khi kiểm tra giới hạn khớp. Khả năng áp dụng phụ thuộc vào cấu trúc tay máy~\cite[mục 3.2.2, tr.~68--70]{me3209}.
+
+Với tay máy phẳng ba khớp quay, gọi \(a_i\) là chiều dài khâu \(i\) và \((x_E,y_E,\phi)\) là tư thế đích. Gốc của khâu cuối nằm tại \(x_B=x_E-a_3\cos\phi\), \(y_B=y_E-a_3\sin\phi\). Áp dụng định lý cosin cho hai khâu đầu, đặt \(D=(x_B^2+y_B^2-a_1^2-a_2^2)/(2a_1a_2)\). Với \(|D|\leq 1\), các góc khớp được tính theo
+\begin{align*}
+ q_2 &= \operatorname{atan2}\bigl(\pm\sqrt{1-D^2},D\bigr),\\
+ q_1 &= \operatorname{atan2}(y_B,x_B)
+       -\operatorname{atan2}(a_2\sin q_2,a_1+a_2\cos q_2),\\
+ q_3 &= \phi-q_1-q_2 .
+\end{align*}
+Hai dấu ở căn tạo ra hai nhánh khuỷu khi \(|D|<1\). Tại \(|D|=1\) hai nhánh trùng nhau theo chu kỳ góc. Nếu \(a_1=a_2\) và \(B\) ở gốc, \(q_2=\pi\) theo chu kỳ góc và \(q_1\) không được xác định duy nhất. Nếu \(|D|>1\), điểm \(B\) nằm ngoài miền với tới. Với tay máy tọa độ trụ RTT, các quan hệ \(x_C=q_3\cos q_1\), \(y_C=q_3\sin q_1\), \(z_C=d_1+q_2\) cho \(q_2=z_C-d_1\) và \(q_3=\sqrt{x_C^2+y_C^2}\) khi hành trình hướng kính không âm. Khi đó \(q_1=\operatorname{atan2}(y_C,x_C)\) nếu \(q_3>0\). Nếu cho phép hành trình có dấu, nhánh \(q_3<0\) đi cùng góc \(q_1\) lệch \(\pi\). Khi \(x_C=y_C=0\), vị trí không xác định góc \(q_1\).
+
+\medskip
+\noindent\textbf{Giải số bằng phương pháp Newton--Raphson.}
+Đặt hệ phương trình phi tuyến \(\mathbf f(\mathbf q)=\mathbf 0\), với \(m\) phương trình và \(n\) biến khớp thực. Ký hiệu \((J_f)_{ab}=\partial f_a/\partial q_b\). Tại vòng lặp \(j\), khai triển Taylor bậc nhất cho
+\begin{align*}
+ \mathbf f(\mathbf q^{(j)}+\Delta\mathbf q)
+ &= \mathbf f(\mathbf q^{(j)})+J_f(\mathbf q^{(j)})\Delta\mathbf q
+    + O(\|\Delta\mathbf q\|^2),\\
+ J_f(\mathbf q^{(j)})\Delta\mathbf q &=-\mathbf f(\mathbf q^{(j)}),\qquad
+ \mathbf q^{(j+1)}=\mathbf q^{(j)}+\Delta\mathbf q .
+\end{align*}
+Khi \(m=n\) và \(J_f\) khả nghịch, bước lý thuyết là \(\Delta\mathbf q=-J_f^{-1}\mathbf f\). Trình tự lặp theo ME3209~\cite[mục 3.2.3, tr.~71--72]{me3209} gồm:
+\begin{enumerate}
+  \item Chọn \(\mathbf q^{(0)}\), dung sai \(\varepsilon\) và số vòng lặp tối đa \(M\).
+  \item Tính \(\mathbf f(\mathbf q^{(j)})\). Nếu \(\|\mathbf f(\mathbf q^{(j)})\|<\varepsilon\), chấp nhận nghiệm. Nếu đã hết số vòng lặp, kết thúc lần tìm nghiệm.
+  \item Tính \(J_f(\mathbf q^{(j)})\), giải hệ tuyến tính tìm \(\Delta\mathbf q\), cập nhật \(\mathbf q^{(j+1)}\) rồi lặp lại.
+\end{enumerate}
+Có thể theo dõi thêm chuẩn của bước \(\Delta\mathbf q\). Nếu bước nhỏ trong khi sai số vẫn vượt dung sai, nghiệm chưa đạt yêu cầu. Giá trị khởi tạo ảnh hưởng đến khả năng hội tụ và nhánh nghiệm thu được.
+
+\medskip
+\noindent\textbf{Chuyển thành bài toán tối ưu có ràng buộc.}
+Theo ME3209~\cite[mục 3.2.4, tr.~72--73]{me3209}, có thể tối thiểu hóa sai lệch bình phương giữa các phần tử của ma trận động học thuận và tư thế đích:
+\[
+ \min_{\mathbf q}\;
+ \frac12\sum_{a=1}^{3}\sum_{b=1}^{4}c_{ab}\bigl(T_{ab}(\mathbf q)-H_{ab}\bigr)^2,
+ \qquad q_{i,\min}\le q_i\le q_{i,\max}.
+\]
+Với mọi \(c_{ab}>0\), giá trị mục tiêu bằng không tương ứng với nghiệm tư thế chính xác. Giá trị tối ưu dương cho một tư thế gần đúng và cần được kiểm tra theo dung sai. Khi chỉ yêu cầu vị trí, đặt trọng số của ba cột hướng bằng không. Với tay máy dư dẫn động, có thể bổ sung tiêu chí như giữ khoảng cách tới giới hạn khớp hoặc tránh vật cản.
+
+Ví dụ, với tay máy SCARA, có thể lập hàm mục tiêu từ bốn phần dư tương ứng với ba tọa độ và góc phương vị. Đặt \(q_{12}=q_1+q_2\). Với chiều trục trong ví dụ của ME3209, vectơ phần dư là
+\[
+ \mathbf f_{\mathrm{SCARA}}=
+ \begin{bmatrix}
+ a_1\cos q_1+a_2\cos q_{12}-x_C\\
+ a_1\sin q_1+a_2\sin q_{12}-y_C\\
+ d_1-q_3-d_4-z_C\\
+ q_{12}-q_4-\phi
+ \end{bmatrix}.
+\]
+Bài toán là tối thiểu hóa \(\|\mathbf f_{\mathrm{SCARA}}\|^2/2\) trong giới hạn bốn khớp, với phần dư góc được tính theo chu kỳ \(2\pi\).
+
+\medskip
+\noindent\textbf{Tách vị trí và hướng.}
+Với tay máy sáu khớp có cổ tay cầu, ba trục khớp cuối giao nhau tại tâm cổ tay \(C\). Vị trí điểm này phụ thuộc vào ba khớp đầu. Gọi \({}^{n}\mathbf r_C\) là vectơ từ gốc hệ khâu cuối đến \(C\), biểu diễn trong hệ khâu cuối. Từ tư thế đích, tính
+\[
+ \mathbf p_C=\mathbf p_d+R_d\,{}^{n}\mathbf r_C
+             =\mathbf p_C(q_1,q_2,q_3).
+\]
+Giải ba phương trình vị trí trước, sau đó giải \({}^3 R_n(q_4,q_5,q_6)=({}^0R_3)^{\mathsf T}R_d\) để tìm các góc cổ tay. Trong ví dụ RTT--RRR của ME3209, \({}^{n}\mathbf r_C=[0,0,-d_6]^{\mathsf T}\) và bài toán vị trí có dạng tọa độ trụ. Phương pháp tách này cần kiểm tra điều kiện hình học của các trục trước khi áp dụng~\cite[mục 3.2.5, tr.~73--75]{me3209}.
+
+\subsubsection*{Thiết lập và giải bài toán động học nghịch cho SR5}
 \noindent\textbf{Đặt bài toán.}
 Cho trước vị trí \(\mathbf p_{d,k}\) và hướng \(R_{d,k}\) của đầu mỏ hàn tại mẫu \(k\), biểu diễn trong hệ đế \(\{0\}\). Bài toán động học nghịch xác định vectơ góc khớp \(\mathbf q_k=[q_{1,k},\ldots,q_{6,k}]^{\mathsf T}\) sao cho pose của đầu mỏ trùng với pose yêu cầu trong dung sai cho phép. Gọi TCP (Tool Center Point) là điểm làm việc của đầu mỏ. Từ kết quả động học thuận ở mục trước, phương trình cần giải là
 \begin{equation}
@@ -144,15 +216,8 @@ Cho trước vị trí \(\mathbf p_{d,k}\) và hướng \(R_{d,k}\) của đầu
 \end{equation}
 Ma trận \({}^6T_{\mathrm{TCP}}\) mô tả vị trí và hướng cố định của đầu mỏ trong hệ khâu cuối của bảng D--H. Khi triển khai trong MoveIt~2, chuỗi động học lấy từ URDF và đã chứa khớp cố định nối mặt bích với \textit{welding\_tcp}. Vì vậy, pose đích được truyền trực tiếp cho hệ \textit{welding\_tcp}.
 
-\noindent\textbf{Phương pháp lặp theo ma trận Jacobi.}
-Tại mỗi pose đích, đồ án sử dụng phương pháp số dựa trên phép tuyến tính hóa Newton--Raphson.
-Trong ME3209, phương trình (3-13) đặt bài toán \(\mathbf f(\mathbf q)=\mathbf 0\). Ở lân cận một nghiệm thử, khai triển Taylor bậc nhất cho
-\[
-  \mathbf f(\mathbf q+\Delta\mathbf q)
-    \simeq\mathbf f(\mathbf q)+J_f(\mathbf q)\Delta\mathbf q,
-  \qquad J_f(\mathbf q)\Delta\mathbf q=-\mathbf f(\mathbf q).
-\]
-Đối với TCP, chọn phần dư vị trí \(\mathbf f_p=\mathbf p(\mathbf q)-\mathbf p_{d,k}\). Khi đó vế phải \(-\mathbf f_p\) chính là dịch chuyển từ vị trí hiện tại đến vị trí yêu cầu. Với hướng mỏ, KDL tính phép quay tương đối và dùng vectơ trục--góc làm hiệu chỉnh góc trong hệ đế. Hai hiệu chỉnh này tạo thành vế phải của hệ tuyến tính sáu chiều.
+\noindent\textbf{Tuyến tính hóa sai số tư thế TCP.}
+Đồ án chọn phương pháp giải số. Phần dư của vị trí là \(\mathbf f_p=\mathbf p(\mathbf q)-\mathbf p_{d,k}\), nên vế phải \(-\mathbf f_p\) là dịch chuyển từ vị trí hiện tại đến vị trí yêu cầu. Với hướng mỏ, KDL dùng vectơ trục--góc của phép quay tương đối làm hiệu chỉnh góc trong hệ đế.
 
 Gọi \(j\) là chỉ số vòng lặp tại mẫu \(k\). Từ bộ góc khớp \(\mathbf q_k^{(j)}\), tính động học thuận để thu được \(\mathbf p^{(j)}\) và \(R^{(j)}\). Sai số pose trong hệ đế được biểu diễn bởi
 \begin{equation}
@@ -189,30 +254,9 @@ Plugin \textit{KDLKinematicsPlugin} tính bước hiệu chỉnh bằng phân r�
 \end{equation}
 Các phần tử đường chéo của \(\Sigma^+\) bằng \(1/\sigma_i\) đối với các giá trị kỳ dị được giữ lại và bằng \(0\) đối với các giá trị dưới ngưỡng của phép giải SVD. KDL giới hạn bước cập nhật theo giới hạn góc khớp và có thể giảm bước nếu sai số pose tăng. Sau mỗi lần cập nhật, bộ giải tính lại động học thuận. Nghiệm hội tụ khi cả chuẩn sai số vị trí và chuẩn sai số hướng đạt dung sai của bộ giải.
 
-\noindent\textbf{Áp dụng cho đường hàn chữ V của SR5.}
-Đường hàn được lấy mẫu thành dãy \((t_k,\mathbf p_{d,k},R_{d,k})\), với \(t_k\) là thời điểm yêu cầu của mẫu \(k\). Trong mô phỏng, mỏ hướng xuống và TCP đặt cách vị trí hàn \(5\,\mathrm{mm}\) theo phương đứng. Tại mẫu đầu tiên, chương trình thử một số bộ góc khởi tạo để tìm nghiệm phù hợp. Từ mẫu tiếp theo, nghiệm của mẫu trước được dùng làm giá trị khởi tạo cho lần thử đầu tiên:
-\[
-  \mathbf q_k^{(0)}=\mathbf q_{k-1}^{\star},\qquad k\geq 1.
-\]
-Chương trình gọi \textit{setFromIK} để giải pose của \textit{welding\_tcp} và kiểm tra nghiệm theo giới hạn khớp và va chạm. Để phát hiện chuyển nhánh nghiệm, chương trình kiểm tra độ thay đổi lớn nhất của một góc khớp giữa hai mẫu. Trong bài thử này, quỹ đạo bị loại nếu \(\|\mathbf q_k^\star-\mathbf q_{k-1}^\star\|_\infty > 0{,}05\,\mathrm{rad}\).
-
-\noindent\textbf{Kết quả tính toán.}
-Chẳng hạn, tại \(t_{501}\approx25{,}047\,\mathrm{s}\), vị trí TCP yêu cầu trong hệ đế là
-\[
-  \mathbf p_{d,501}\approx
-    [0{,}466610,\,-0{,}002530,\,0{,}305000]^{\mathsf T}\,\mathrm{m}.
-\]
-Hướng đích của mỏ tại mẫu này là \(R_{d,501}=\operatorname{diag}(1,-1,-1)\). Dùng nghiệm tại mẫu \(500\) làm giá trị khởi tạo, chương trình giải được bộ góc khớp
-\[
-  \mathbf q_{501}^{\star}\approx
-    [2{,}84042,\,-0{,}29191,\,1{,}50121,\,-3{,}14159,\,-1{,}34847,\,2{,}84042]^{\mathsf T}
-    \,\mathrm{rad}.
-\]
-Trên toàn bộ \(1\,969\) mẫu, sai số vị trí TCP lớn nhất khi tính lại bằng động học thuận là \(0{,}00995\,\mathrm{mm}\). Độ thay đổi góc lớn nhất của một khớp giữa hai mẫu liên tiếp là \(0{,}0265^\circ\). Chương trình kiểm tra giới hạn khớp và va chạm tại \(11\,808\) lượt lấy mẫu trên các đoạn nội suy, tất cả đều đạt trong mô hình mô phỏng. Cuối cùng, các nghiệm \((t_k,\mathbf q_k^\star)\) được xuất thành quỹ đạo khớp theo thời gian để mô phỏng.
-
 \subsection{Động học vi phân}
-\subsubsection*{Cơ sở lý thuyết của ma trận Jacobi hình học}
-Động học vi phân xác định vận tốc tịnh tiến \(\mathbf v_E\) và vận tốc góc \(\vec{\omega}_E\) của khâu cuối từ vận tốc các khớp. Gọi \(E\) là TCP của đầu mỏ hàn. Biểu diễn hai vectơ vận tốc trong hệ đế \(\{0\}\), ta có
+\subsubsection*{Công thức tổng quát của ma trận Jacobi}
+Xét điểm công tác \(E\) của tay máy chuỗi \(n\) khớp. Gọi \(\mathbf p_E\) và \(R_E\) là vị trí và ma trận quay của hệ dụng cụ đối với hệ đế. Theo ME3209~\cite[mục 3.3.2--3.3.4, tr.~77--87]{me3209}, vận tốc tịnh tiến \(\mathbf v_E\) và vận tốc góc \(\vec{\omega}_E\), biểu diễn trong hệ đế, thỏa mãn
 \begin{equation}
   \begin{bmatrix}\mathbf v_E\\\vec{\omega}_E\end{bmatrix}
   =
@@ -221,31 +265,67 @@ Trên toàn bộ \(1\,969\) mẫu, sai số vị trí TCP lớn nhất khi tính
   =J_E(\mathbf q)\dot{\mathbf q}.
   \label{eq:sr5-velocity-jacobian}
 \end{equation}
-Theo phương pháp hình học, khớp quay \(i\) tạo vận tốc góc \(\dot q_i\mathbf z_{i-1}\) quanh trục \(\mathbf z_{i-1}\). Tác dụng của chuyển động này tại TCP bằng tích có hướng của vận tốc góc với vectơ từ gốc \(O_{i-1}\) đến \(E\).
-Vì SR5 có sáu khớp quay, cả sáu cột của ma trận Jacobi đều có dạng
-\begin{equation}
-  J_{E,i} =
-  \begin{bmatrix}
-    \mathbf z_{i-1}\times(\mathbf p_E-\mathbf o_{i-1})\\
-    \mathbf z_{i-1}
-  \end{bmatrix},
-  \qquad
-  J_E=[J_{E,1}\ \cdots\ J_{E,6}].
-  \label{eq:sr5-jacobian-column}
-\end{equation}
-Trong đó, \(\mathbf o_{i-1}\) là tọa độ gốc \(O_{i-1}\), còn \(\mathbf z_{i-1}\) là vectơ đơn vị dọc theo trục quay của khớp \(i\). Hai vectơ này được lấy từ tích ma trận D--H \({}^0T_{i-1}\) ở mục 2.2.1:
+
+\noindent\textbf{Tính từ ma trận biến đổi thuần nhất.}
+Từ \(\mathbf v_E=\dot{\mathbf p}_E\) suy ra \(J_v=\partial\mathbf p_E/\partial\mathbf q\).
+Với ký hiệu \([\mathbf a]_\times\mathbf b=\mathbf a\times\mathbf b\), lấy đạo hàm các cột của \(R_E\) cho \([\vec{\omega}_E]_\times=\dot R_E R_E^{\mathsf T}\). Thay \(\dot R_E=\sum_{i=1}^{n}(\partial R_E/\partial q_i)\dot q_i\) vào công thức này thu được hai khối của cột thứ \(i\):
 \[
-  {}^0T_{i-1}=
-  \begin{bmatrix}{}^0R_{i-1}&\mathbf o_{i-1}\\\mathbf 0^{\mathsf T}&1\end{bmatrix},
-  \qquad
-  \mathbf z_{i-1}={}^0R_{i-1}[0,\,0,\,1]^{\mathsf T}.
+  J_{v,i}=\frac{\partial\mathbf p_E}{\partial q_i},
+  \qquad [J_{\omega,i}]_\times
+  =\frac{\partial R_E}{\partial q_i}R_E^{\mathsf T}.
 \]
-Với khớp 1, \({}^0T_0=I_4\), nên \(\mathbf o_0=\mathbf 0\) và \(\mathbf z_0=[0,\,0,\,1]^{\mathsf T}\). Gọi \(\mathbf p_E=[x_E,y_E,z_E]^{\mathsf T}\), cột thứ nhất được tính trực tiếp:
+
+\noindent\textbf{Tính theo phương pháp hình học.}
+Gọi \(\mathbf o_{i-1}\) là tọa độ một điểm trên trục khớp \(i\) và \(\mathbf z_{i-1}\) là vectơ đơn vị của trục, cùng biểu diễn trong hệ đế. Khi chỉ khớp quay \(i\) chuyển động, nó tạo vận tốc góc \(\dot q_i\mathbf z_{i-1}\) và vận tốc tịnh tiến tại \(E\) bằng \(\dot q_i\mathbf z_{i-1}\times(\mathbf p_E-\mathbf o_{i-1})\). Khớp trượt tạo vận tốc tịnh tiến \(\dot q_i\mathbf z_{i-1}\) và vận tốc góc bằng không. Cộng đóng góp của từng khớp cho
+\begin{equation}
+ J_E=[J_{E,1}\ \cdots\ J_{E,n}],\qquad
+ J_{E,i}=
+ \begin{cases}
+  \begin{bmatrix}
+   \mathbf z_{i-1}\times(\mathbf p_E-\mathbf o_{i-1})\\
+   \mathbf z_{i-1}
+  \end{bmatrix}, & \text{khớp quay},\\[8pt]
+  \begin{bmatrix}\mathbf z_{i-1}\\\mathbf 0\end{bmatrix}, & \text{khớp trượt}.
+ \end{cases}
+ \label{eq:sr5-jacobian-column}
+\end{equation}
+Với một điểm thuộc khâu \(k\), thay \(\mathbf p_E\) bằng vị trí của điểm đó và đặt \(J_{E,i}=\mathbf 0\) cho \(i>k\). Khi đổi cách biểu diễn vận tốc tại cùng điểm \(E\) từ hệ đế sang hệ dụng cụ, nhân cả hai khối của \(J_E\) với \(R_E^{\mathsf T}\).
+
+\noindent\textbf{Quan hệ với Jacobi giải tích.}
+Gọi \(\vec{\phi}\) là bộ ba tham số hướng và \(B(\vec{\phi})\) là ma trận thỏa mãn \(\vec{\omega}_E=B(\vec{\phi})\dot{\vec{\phi}}\). Khi \(B\) khả nghịch, Jacobi giải tích là
 \[
-  J_{E,1}=[-y_E,\,x_E,\,0,\,0,\,0,\,1]^{\mathsf T}.
+ J_a=\frac{\partial(\mathbf p_E,\vec{\phi})}{\partial\mathbf q}
+     =\begin{bmatrix} I_3&0\\0&B^{-1}(\vec{\phi})\end{bmatrix}J_E.
+\]
+Với quy ước Euler \(R_E=R_z(\psi)R_x(\theta)R_z(\phi)\), ba cột của \(B\) là các trục quay liên tiếp biểu diễn trong hệ đế:
+\[
+ \vec{\phi}=[\psi,\theta,\phi]^{\mathsf T},\qquad
+ B=\begin{bmatrix}
+ 0&\cos\psi&\sin\theta\sin\psi\\
+ 0&\sin\psi&-\sin\theta\cos\psi\\
+ 1&0&\cos\theta
+ \end{bmatrix}.
+\]
+Với Jacobi hình học, đạo hàm phương trình vận tốc theo thời gian trong hệ đế cho quan hệ gia tốc tổng quát:
+\[
+ \begin{bmatrix}\mathbf a_E\\\dot{\vec{\omega}}_E\end{bmatrix}
+ =J_E\ddot{\mathbf q}+\dot J_E\dot{\mathbf q},
+ \qquad
+ \dot J_E=\sum_{i=1}^{n}\frac{\partial J_E}{\partial q_i}\dot q_i .
 \]
 
 \subsubsection*{Áp dụng cho robot SR5}
+Cả sáu cột của \(J_E\) lấy nhánh khớp quay trong phương trình~\eqref{eq:sr5-jacobian-column}. Theo quy ước D--H tiêu chuẩn, trục khớp \(i\) đi qua \(O_{i-1}\) và có hướng \(z_{i-1}\):
+\[
+ {}^0T_{i-1}=
+ \begin{bmatrix}{}^0R_{i-1}&\mathbf o_{i-1}\\\mathbf 0^{\mathsf T}&1\end{bmatrix},
+ \qquad
+ \mathbf z_{i-1}={}^0R_{i-1}[0,\,0,\,1]^{\mathsf T}.
+\]
+Với \({}^0T_0=I_4\) và \(\mathbf p_E=[x_E,y_E,z_E]^{\mathsf T}\), cột thứ nhất là
+\[
+ J_{E,1}=[-y_E,\,x_E,\,0,\,0,\,0,\,1]^{\mathsf T}.
+\]
 Khi đưa góc khớp từ mô phỏng vào bảng~\ref{tab:dh}, cần quy đổi theo chiều trục của hai mô hình. Gọi \(\mathbf q^{\mathrm{ROS}}\) là góc khớp trong URDF và \(\mathbf q^{\mathrm{DH}}\) là góc dùng trong bảng D--H. Với cách gán hệ hiện tại, chiều dương của khớp 2 và khớp 6 ngược với URDF. Do đó
 \[
   S=\operatorname{diag}(1,-1,1,1,1,-1),\qquad
@@ -262,34 +342,3 @@ Gọi \(J_E^{\mathrm{DH}}\) là ma trận tính theo phương trình~\eqref{eq:s
   = J_E^{\mathrm{DH}}(S\mathbf q^{\mathrm{ROS}})\,S.
   \label{eq:sr5-jacobian-ros}
 \end{equation}
-
-\noindent\textbf{Tính tại mẫu 501 trên đường hàn chữ V.}
-Thay bộ góc khớp ở mục 2.2.2 vào bảng D--H sau khi quy đổi, ta thu được \(\mathbf p_E\approx[0{,}466610,\,-0{,}002530,\,0{,}305000]^{\mathsf T}\,\mathrm{m}\). Lấy các trục và gốc từ \({}^0T_0,\ldots,{}^0T_5\), sau đó tính lần lượt sáu tích có hướng, thu được
-\[
-  J_E^{\mathrm{DH}}\approx
-  \begin{bmatrix}
-     0{,}002530 &-0{,}021965 &-0{,}401542 & 0{,}110666 & 0{,}270739 & 0\\
-     0{,}466610 & 0{,}006823 & 0{,}124728 & 0{,}255180 &-0{,}084098 & 0\\
-     0          &-0{,}446358 &-0{,}379130 & 0{,}132653 & 0          & 0\\
-     0          & 0{,}296642 & 0{,}296642 & 0{,}931485 &-0{,}296642 & 0\\
-     0          & 0{,}954989 & 0{,}954989 &-0{,}289341 &-0{,}954989 & 0\\
-     1          & 0          & 0          &-0{,}220496 & 0          & 1
-  \end{bmatrix}.
-\]
-Ba phần tử trên cùng của cột thứ sáu bằng \(0\) vì TCP nằm trên trục khớp 6 trong mô hình mỏ của demo. Các phần tử của ma trận được làm tròn khi trình bày. Phép đối chiếu dùng giá trị đầy đủ.
-
-Vận tốc khớp tại mẫu \(501\) được xấp xỉ bằng sai phân trung tâm theo hai mẫu kề:
-\[
-  \dot{\mathbf q}^{\mathrm{DH}}_{501}
-  \approx \frac{S(\mathbf q^{\mathrm{ROS}}_{502}-\mathbf q^{\mathrm{ROS}}_{500})}
-                {t_{502}-t_{500}}
-  \approx 10^{-3}[-7{,}232,\,6{,}702,\,-7{,}891,\,0,\,-1{,}188,\,7{,}232]^{\mathsf T}
-  \,\mathrm{rad/s}.
-\]
-Nhân ma trận Jacobi với vận tốc khớp theo phương trình~\eqref{eq:sr5-velocity-jacobian} cho vận tốc tịnh tiến
-\[
-  \mathbf v_E\approx[2{,}681,\,-4{,}213,\,0]^{\mathsf T}\,\mathrm{mm/s},
-  \qquad
-  \|\mathbf v_E\|\approx4{,}994\,\mathrm{mm/s}.
-\]
-Vận tốc góc xấp xỉ bằng \(0\) tại mẫu này, phù hợp với yêu cầu giữ hướng mỏ cố định. Sai phân trung tâm từ các vị trí TCP trong tệp \textit{fk.csv} cũng cho tốc độ \(4{,}994\,\mathrm{mm/s}\) sau khi làm tròn. Trên toàn bộ \(1\,969\) mẫu, ma trận quy đổi theo phương trình~\eqref{eq:sr5-jacobian-ros} và ma trận MoveIt~2 lưu trong tệp \textit{jacobian.csv} sai khác lớn nhất khoảng \(1{,}2\times10^{-15}\) theo từng phần tử khi tính bằng mét và radian.
