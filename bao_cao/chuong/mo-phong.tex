@@ -1,0 +1,74 @@
+\chapter{Mô phỏng robot}
+Chương này trình bày cách dựng mô hình ROKAE SR5-5/0.9C trong ROS~2 và MuJoCo. Mô hình gốc lấy từ tệp Xacro của ROKAE. Hai môi trường biểu diễn cùng một chuỗi gồm đế cố định, sáu khâu động và sáu khớp quay. Để đối chiếu hình học, các hình trong chương sử dụng cùng bộ góc khớp \([0^\circ,30^\circ,-60^\circ,0^\circ,-90^\circ,0^\circ]^{\mathsf T}\) theo quy ước URDF.
+
+\section{Mô phỏng mô hình robot trên ROS 2}
+Tệp \texttt{xMateSR5.urdf.xacro} do ROKAE cung cấp được xử lý thành URDF (Unified Robot Description Format).\footnote{ROKAE, \href{https://github.com/RokaeRobot/rokae_ros2/blob/d6a508c38513d4c39b2f10f14275d0e26df7fb43/rokae_description/urdf/xMateSR5.urdf.xacro}{mô hình Xacro của xMateSR5}.} Trong URDF, mỗi thẻ \verb|<link>| biểu diễn một khâu. Thẻ \verb|<visual>| chứa hình học hiển thị, \verb|<collision>| chứa hình học dùng để kiểm tra va chạm và \verb|<inertial>| chứa khối lượng, vị trí khối tâm và các thành phần của tensor quán tính. Các lưới STL được tham chiếu trong thẻ \verb|<mesh>| với hệ số tỉ lệ \(0{,}001\) để đổi từ milimét sang mét.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=.74\linewidth,height=.21\textheight,keepaspectratio]{hinh/03-mo-phong/3.1-ros2/hinh-3-1-mo-hinh-urdf.png}
+  \caption{Robot SR5 hiển thị trong RViz trên ROS~2}
+  \label{fig:sr5-ros-urdf}
+\end{figure}
+
+Thẻ \verb|<joint>| nối một khâu cha với một khâu con. \texttt{origin} xác định vị trí và hướng của hệ khớp khi góc khớp bằng \(0\) so với hệ khâu cha. \texttt{axis} xác định chiều trục quay trong hệ khớp, còn \texttt{limit} khai báo các giới hạn vị trí, vận tốc và mômen. Ví dụ, khớp \texttt{joint1} nối đế với khâu 1 và quay quanh trục \(z\), với gốc khớp cao \(328\,\mathrm{mm}\) so với gốc đế.
+
+\begingroup\small
+\begin{verbatim}
+<joint name="joint1" type="revolute">
+  <parent link="xMateSR5_base"/>
+  <child link="xMateSR5_link1"/>
+  <origin xyz="0 0 0.328" rpy="0 0 0"/>
+  <axis xyz="0 0 1"/>
+  <limit effort="113" lower="-6.2832" upper="6.2832"
+         velocity="3.141592653589793"/>
+</joint>
+\end{verbatim}
+\endgroup
+
+Nút \texttt{robot\_state\_publisher} đọc URDF và nhận góc khớp qua \texttt{joint\_states}. RViz dùng các phép biến đổi do nút này công bố để hiển thị tư thế robot.
+
+\clearpage
+\section{Mô phỏng mô hình robot trên MuJoCo}
+Mô hình \texttt{sr5\_robot\_only.xml} được tạo trong đồ án bằng cách chuyển URDF của ROKAE sang định dạng MJCF. Thẻ \verb|<worldbody>| chứa đế robot. Sáu khâu động được mô tả bằng các thẻ \verb|<body>| lồng nhau theo chuỗi động học. Đế được gắn cố định vào hệ thế giới. Mỗi khâu động chứa một khớp kiểu \texttt{hinge}, cho phép khâu quay tương đối so với khâu cha.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=.74\linewidth,height=.21\textheight,keepaspectratio]{hinh/03-mo-phong/3.2-mujoco/hinh-3-2-mo-hinh-mjcf.png}
+  \caption{Robot SR5 trong cửa sổ mô phỏng MuJoCo tại cùng bộ góc khớp}
+  \label{fig:sr5-mujoco-mjcf}
+\end{figure}
+
+Ví dụ, khâu 1 được khai báo là \texttt{body} con của đế. Thuộc tính \texttt{pos} của khâu con giữ độ lệch \(0{,}328\,\mathrm{m}\) từ mô hình gốc. Khớp \texttt{joint1} nằm tại gốc của khâu con và có trục quay \(z\). Giá trị \texttt{range} trong mô hình này tính bằng radian.
+
+\begingroup\small
+\begin{verbatim}
+<body name="xMateSR5_base">
+  <body name="xMateSR5_link1" pos="0 0 0.328">
+    <joint name="joint1" type="hinge"
+           axis="0 0 1" range="-6.2832 6.2832"/>
+  </body>
+</body>
+\end{verbatim}
+\endgroup
+
+Các lưới STL được khai báo trong \verb|<asset>| và được tham chiếu từ các thẻ \verb|<geom>| trong từng khâu. Mỗi lưới có thể được dùng cho hiển thị hoặc tiếp xúc tùy theo cấu hình của \texttt{geom}. Thẻ \verb|<inertial>| lưu khối lượng, tọa độ khối tâm \texttt{pos} và sáu thành phần quán tính \texttt{fullinertia}. Khối \verb|<actuator>| chứa sáu thẻ \verb|<motor>| tác dụng mômen lên sáu khớp.
+
+\begin{table}[H]
+  \centering
+  \caption{Đối chiếu các thành phần của mô hình SR5 trong URDF và MJCF}
+  \label{tab:sr5-urdf-mjcf}
+  \renewcommand{\arraystretch}{1.13}
+  \begin{tabular}{@{}p{.21\linewidth}p{.34\linewidth}p{.37\linewidth}@{}}
+    \toprule
+    Thành phần & URDF trên ROS~2 & MJCF trên MuJoCo \\
+    \midrule
+    Khâu & \verb|<link>| & \verb|<body>| \\
+    Quan hệ cha--con & \verb|<parent>| và \verb|<child>| & Các thẻ \texttt{body} lồng nhau \\
+    Khớp quay & \verb|<joint type="revolute">| & \verb|<joint type="hinge">| \\
+    Tư thế lắp khâu & \texttt{xyz} và \texttt{rpy} trong \texttt{origin} & \texttt{pos} và \texttt{euler} của khâu con \\
+    Hình học & \verb|<visual>| và \verb|<collision>| & \verb|<geom>| dùng lưới từ \verb|<asset>| \\
+    Quán tính & \texttt{mass}, \texttt{origin} và \texttt{inertia} & \texttt{mass}, \texttt{pos} và \texttt{fullinertia} trong \texttt{inertial} \\
+    \bottomrule
+  \end{tabular}
+\end{table}

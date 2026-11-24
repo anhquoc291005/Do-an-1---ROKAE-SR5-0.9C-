@@ -1,0 +1,32 @@
+% !TeX root = ../main.tex
+\chapter{Tổng quan}
+
+\section{Giới thiệu chung về Robot dạng chuỗi}
+
+Khác với Robot song song, mỗi chuỗi khâu thường bắt đầu từ đế và kết thúc ở bàn động, Robot dạng chuỗi có các khâu được nối tiếp với nhau từ gốc đến đầu. Hầu hết các robot dạng chuỗi hở có 6 bậc tự do với hai loại khớp quay và tịnh tiến. Khâu cuối có mặt bích để có thể gắn các dụng cụ phù hợp với từng nhiệm vụ như tay kẹp, camera, mỏ hàn,... Khi một khớp chuyển động, sẽ kéo theo các khâu phía sau. Vì vậy, vị trí và hướng của dụng cụ so với đế được xác định dựa vào chuyển động phối hợp của các khâu trong chuỗi.
+
+Ưu điểm của cấu trúc này là vùng làm việc rộng và khả năng tiếp cận phôi từ nhiều hướng. Tuy nhiên, sai số tại các khớp có thể tích lũy ở đầu công tác, còn độ cứng vững của tay máy phụ thuộc vào tư thế làm việc. Robot nối tiếp được sử dụng phổ biến trong lắp ráp và hàn. Trong đồ án này, robot ROKAE SR5-5/0.9C có sáu khớp quay, cho phép điều chỉnh đồng thời vị trí và hướng của mỏ hàn khi di chuyển dọc theo đường hàn.
+
+\section{Giới thiệu về Robot chuỗi ROKAE SR5-5/0.9C}
+
+\subsection{Ưu nhược điểm của Robot}
+
+ROKAE SR5-5/0.9C là tay máy nối tiếp có sáu khớp quay và tầm với 919 mm. Ưu điểm của robot là khả năng phối hợp các khớp để thay đổi cả vị trí và hướng của dụng cụ. Trong ứng dụng hàn, khả năng này cho phép đầu mỏ di chuyển dọc theo đường hàn đồng thời duy trì góc làm việc yêu cầu so với bề mặt phôi. Chẳng hạn, khi hàn tại giao tuyến của hai tấm thép, robot có thể nghiêng mỏ để tiếp cận khe hàn và giữ góc nghiêng đó trong suốt đoạn hàn thẳng. Robot còn có độ lặp lại vị trí \(\pm0{,}03\,\mathrm{mm}\), thuận lợi khi thực hiện cùng một chương trình hàn trên nhiều phôi được gá ở cùng vị trí.
+
+Hạn chế của SR5 là tải trọng tối đa tại mặt bích chỉ đạt 5 kg. Khi lựa chọn mỏ hàn hoặc camera 3D, cần tính cả khối lượng dụng cụ, giá lắp và các phụ kiện đi kèm. Khả năng tiếp cận cũng phụ thuộc vào tư thế của tay máy. Một điểm hàn dù nằm trong tầm với vẫn có thể khó tiếp cận nếu góc mỏ yêu cầu khiến cổ tay chạm giới hạn khớp hoặc thân mỏ vướng vào phôi. Ngoài ra, ở gần cấu hình kỳ dị, một số khớp có thể phải quay nhanh để đầu mỏ duy trì tốc độ hàn. Vì vậy, khi lập quỹ đạo cho SR5, cần kiểm tra góc khớp, vận tốc khớp và khoảng hở giữa mỏ với phôi trên toàn bộ đường hàn.
+
+\subsection{Lý do chọn đề tài}
+
+Robot chuỗi ROKAE SR5-5/0.9C là một dạng cấu trúc phù hợp cho sinh viên như em tiếp cận các kiến thức nền tảng như động học, động lực học, điều khiển và thiết kế.
+
+Lý do em chọn đề tài xuất phát từ mong muốn tìm hiểu về nguyên lí hoạt động, mô phỏng robot. Đồng thời đề tài cũng là cơ hội cho em vận dụng các kiến thức đã học để giải một hệ thống kỹ thuật cụ thể, qua đó nâng cao kỹ năng về mô phỏng MuJoCo, ROS2,...
+
+Mục tiêu đề tài:
+
+\begin{itemize}
+
+\item Xây dựng, mô phỏng mô hình động học Robot
+
+\item Mô phỏng và điều khiển robot trên MuJoCo với các tác vụ hàn cơ bản
+
+\end{itemize}

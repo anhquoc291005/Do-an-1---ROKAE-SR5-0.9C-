@@ -4,6 +4,8 @@ Mã nguồn đồ án cho tay máy nối tiếp sáu khớp quay. Hai ví dụ h
 
 ## Cấu trúc
 
+[Báo cáo PDF](bao_cao/main.pdf) · [Mã LaTeX](bao_cao/main.tex) · [Chương 3 — Mô phỏng robot](bao_cao/chuong/mo-phong.tex)
+
 | Thư mục | Các tệp chính và chức năng |
 |---|---|
 | `forward_kinematics/` | `fk.py` tính tư thế mặt bích, TCP và Jacobian hình học từ URDF. `fk_symbolic.py` tính ma trận D–H ở dạng ký hiệu. `draw_standard_dh.py` tính theo DH tiêu chuẩn và so sánh với URDF. |
@@ -69,6 +71,27 @@ Với cấu hình này, vị trí mặt bích trong hệ đế xấp xỉ (643,3
 `fk_symbolic.py` dùng cách gán trục trong [sơ đồ D–H của đồ án](image/hinh_2_2_1_dh.svg). Các góc khớp theo chiều dương của URDF nên hàng 2 dùng `beta - q_2`. Khi thay số, dùng radian cho góc, giữ dấu các tham số D–H và dùng cùng một đơn vị chiều dài.
 
 ## 3. Mô phỏng và hiển thị
+
+Hai ảnh chụp dưới đây dùng cùng bộ góc khớp `[0, 30, -60, 0, -90, 0]` theo độ.
+
+| ROS 2 / RViz | MuJoCo |
+|---|---|
+| ![SR5 trong RViz](bao_cao/hinh/03-mo-phong/3.1-ros2/hinh-3-1-mo-hinh-urdf.png) | ![SR5 trong MuJoCo](bao_cao/hinh/03-mo-phong/3.2-mujoco/hinh-3-2-mo-hinh-mjcf.png) |
+
+Mở mô hình ROS 2 sau khi chạy `fetch_sources.py` và cài gói `ros-jazzy-joint-state-publisher`:
+
+```bash
+source /opt/ros/jazzy/setup.bash
+ros2 launch "$PWD/simulation/ros2/robot_only.launch.py"
+```
+
+Sau khi tạo dữ liệu của ví dụ chữ V, các lệnh sau mở mô hình SR5 trong MuJoCo và tính lại vận tốc TCP ở mẫu 501 của báo cáo:
+
+```bash
+"$MUJOCO_PYTHON" simulation/mujoco/build_model.py
+"$MUJOCO_PYTHON" simulation/mujoco/robot_only.py
+/usr/bin/python3 forward_kinematics/velocity_example.py --sample 501
+```
 
 ```bash
 # Bám toàn bộ quỹ đạo chữ V bằng MuJoCo

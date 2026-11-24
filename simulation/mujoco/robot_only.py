@@ -94,7 +94,7 @@ def view():
                 print('Target angles (deg):',np.round(np.rad2deg(state['target']),1),flush=True)
             elif code in [ord('R'),ord('r')]:state['target']=HOME.copy()
             elif code==32:state['paused']=not state['paused']
-    with mujoco.viewer.launch_passive(robot.model,robot.data,key_callback=key) as viewer:
+    with mujoco.viewer.launch_passive(robot.model,robot.data,key_callback=key, show_right_ui=False) as viewer:
         viewer.cam.lookat[:]=[.27,.025,.45];viewer.cam.distance=1.85
         viewer.cam.azimuth=135;viewer.cam.elevation=-22
         viewer.opt.geomgroup[3]=0
