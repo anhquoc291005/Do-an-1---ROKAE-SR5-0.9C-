@@ -1,6 +1,18 @@
-# Động học và mô phỏng robot ROKAE SR5-5/0.9C
+# Đồ án 1 – Tính toán động học và mô phỏng robot ROKAE SR5-5/0.9C bám đường hàn
 
-Mã nguồn đồ án cho tay máy nối tiếp sáu khớp quay. Hai ví dụ hàn nhận dãy vị trí và hướng mỏ theo thời gian, dùng MoveIt 2/KDL để tìm sáu góc khớp rồi kiểm tra lại bằng động học thuận. MuJoCo dùng quỹ đạo chữ V để mô phỏng chuyển động dưới tác dụng của trọng lực. Ví dụ camera lập các tư thế quan sát phôi bằng bộ giải IK riêng trong Python.
+## Bài toán của đồ án
+
+Cho trước một dãy điểm trên đường hàn theo thứ tự di chuyển và hướng mỏ tại từng điểm. Cần xác định **sáu góc khớp của robot theo thời gian** để đầu mỏ đi dọc đường hàn, giữ hướng và khoảng cách yêu cầu với phôi, đồng thời đạt tốc độ đặt. Quỹ đạo khớp phải liên tục, nằm trong giới hạn chuyển động của robot và tránh va chạm với phôi, bàn gá cũng như giữa các khâu.
+
+| Thành phần | Nội dung |
+|---|---|
+| Đầu vào | Tọa độ các điểm hàn và hướng mỏ trong hệ đế robot, khoảng cách từ đầu mỏ đến đường hàn, quy luật tốc độ, mô hình robot và vị trí phôi. |
+| Phương pháp | Từ đường hàn, tính vị trí và hướng cần đạt của điểm công tác ở đầu mỏ (TCP) tại từng thời điểm. Trong ROS 2, dùng MoveIt 2 với bộ giải động học nghịch KDL để tìm sáu góc khớp cho mỗi mẫu, lấy nghiệm trước làm giá trị khởi tạo cho mẫu kế tiếp. |
+| Đầu ra và kiểm chứng | Xuất dãy `(t, q₁, q₂, q₃, q₄, q₅, q₆)`. Dùng động học thuận để kiểm tra sai số vị trí và hướng của mỏ, dùng ma trận Jacobi để tính tốc độ TCP, rồi kiểm tra giới hạn góc khớp và va chạm dọc quỹ đạo. |
+
+**Bài thử chính** là đường hàn thẳng dài 117,4 mm trên phôi chữ T. Mỏ giữ nguyên hướng, cách đường hàn 5 mm, tăng tốc từ trạng thái nghỉ đến tốc độ đỉnh 5 mm/s rồi giảm tốc về 0 ở cuối đường. Quỹ đạo thu được gồm 882 mẫu trong 44,025 s. [Xem cách tính và kết quả ở mục 3.3 của báo cáo](bao_cao/chuong/3-3-han-thang.tex).
+
+Đồ án dùng RViz để quan sát chuyển động của robot. Với bài thử đường hàn chữ V, MuJoCo mô phỏng robot bám quỹ đạo khớp dưới tác dụng của trọng lực. Phần camera gắn trên mặt bích là bài toán mở rộng về lập quỹ đạo quan sát các vị trí cần hàn.
 
 ## Cấu trúc
 
