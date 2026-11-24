@@ -2,7 +2,7 @@
 Chương này trình bày cách dựng mô hình ROKAE SR5-5/0.9C trong ROS~2 và MuJoCo. Mô hình gốc lấy từ tệp Xacro của ROKAE. Hai môi trường biểu diễn cùng một chuỗi gồm đế cố định, sáu khâu động và sáu khớp quay. Để đối chiếu hình học, các hình trong chương sử dụng cùng bộ góc khớp \([0^\circ,30^\circ,-60^\circ,0^\circ,-90^\circ,0^\circ]^{\mathsf T}\) theo quy ước URDF.
 
 \section{Mô phỏng mô hình robot trên ROS 2}
-Tệp \texttt{xMateSR5.urdf.xacro} do ROKAE cung cấp được xử lý thành URDF (Unified Robot Description Format).\footnote{ROKAE, \href{https://github.com/RokaeRobot/rokae_ros2/blob/d6a508c38513d4c39b2f10f14275d0e26df7fb43/rokae_description/urdf/xMateSR5.urdf.xacro}{mô hình Xacro của xMateSR5}.} Trong URDF, mỗi thẻ \verb|<link>| biểu diễn một khâu. Thẻ \verb|<visual>| chứa hình học hiển thị, \verb|<collision>| chứa hình học dùng để kiểm tra va chạm và \verb|<inertial>| chứa khối lượng, vị trí khối tâm và các thành phần của tensor quán tính. Các lưới STL được tham chiếu trong thẻ \verb|<mesh>| với hệ số tỉ lệ \(0{,}001\) để đổi từ milimét sang mét.
+Tệp \texttt{xMateSR5.urdf.xacro} do ROKAE cung cấp được xử lý thành URDF (Unified Robot Description Format). Trong URDF, mỗi thẻ \verb|<link>| biểu diễn một khâu. Thẻ \verb|<visual>| chứa hình học hiển thị, \verb|<collision>| chứa hình học dùng để kiểm tra va chạm và \verb|<inertial>| chứa khối lượng, vị trí khối tâm và các thành phần của tensor quán tính. Các lưới STL được tham chiếu trong thẻ \verb|<mesh>| với hệ số tỉ lệ \(0{,}001\) để đổi từ milimét sang mét.
 
 \begin{figure}[H]
   \centering
@@ -72,3 +72,5 @@ Các lưới STL được khai báo trong \verb|<asset>| và được tham chi�
     \bottomrule
   \end{tabular}
 \end{table}
+
+\input{chuong/3-3-han-thang}
