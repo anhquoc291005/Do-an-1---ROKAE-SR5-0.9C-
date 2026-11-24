@@ -124,6 +124,4 @@ bash simulation/camera/run.sh --part all
 
 Mỗi phôi có một thư mục kết quả riêng trong `simulation/camera/results/`. Tệp `camera_waypoints.csv` chứa tư thế camera tại thời điểm chụp, với quaternion theo thứ tự qw, qx, qy, qz. Camera và gá lắp là mô hình giả định của đồ án.
 
-## Đưa lên GitHub
 
-Dùng thư mục chứa README này làm thư mục gốc của repository. Tệp `.gitignore` loại môi trường Python, nguồn tải ngoài, thư mục build, tệp sinh tự động và kết quả chạy. Sau khi clone sang máy khác, thực hiện lại bước chuẩn bị để các đường dẫn mesh được tạo đúng theo vị trí mới.
